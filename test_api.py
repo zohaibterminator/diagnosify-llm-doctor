@@ -1,13 +1,21 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
 from langchain_community.document_loaders import PyMuPDFLoader
-path = r"C:\Users\shahe\OneDrive\Desktop\NLP Sessions\Project\Diagnosify\04012024HR8220R.pdf"
 
 
 app = FastAPI()
 
-@app.post('/pdf')
-def load_pdf(path):
-    loader = PyMuPDFLoader(path)
+
+@app.post('/lab_report')
+async def load_pdf(file: UploadFile):
+    extension = file.filename[-3:]
+
+    if extension != 'pdf':
+        return {
+            'data': 'Invalid file format',
+            'extension': extension
+        }
+
+    loader = PyMuPDFLoader(file.filename)
     pages = loader.load_and_split()
     return {
         'data': pages[0].page_content
@@ -15,8 +23,7 @@ def load_pdf(path):
 
 
 @app.post('/x_rays')
-def load_xrays(data):
-    #loader
+async def load_xrays(file: UploadFile):
     return {
-        'data': 'working'
+        'data': file
     }
